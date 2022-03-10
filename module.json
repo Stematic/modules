@@ -1,0 +1,58 @@
+{
+    "$id": "https://stematic.co.uk/schema/module.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Describes an application module.",
+    "type": "object",
+    "required": [
+        "name",
+        "vendor",
+        "description",
+        "authors",
+        "version"
+    ],
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The human readable name for the module."
+        },
+        "vendor": {
+            "type": "string",
+            "description": "A lower cased, hyphenated name of the modules vendor."
+        },
+        "slug": {
+            "type": "string",
+            "description": "A lower cased, hyphenated name of the module. If this is not set a name will be generated automatically based on the provided 'name'."
+        },
+        "description": {
+            "type": "string",
+            "description": "A summary of what the module is designed to do."
+        },
+        "authors": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "type": "object",
+                "required": ["name", "email"],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The authors name."
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "The authors email address."
+                    },
+                    "website": {
+                        "type": "string",
+                        "description": "The authors website."
+                    }
+                }
+            }
+        },
+        "version": {
+            "type": "string",
+            "description": "The modules current version as a string."
+        }
+    }
+}

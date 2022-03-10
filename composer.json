@@ -1,0 +1,35 @@
+{
+    "name": "stematic/modules",
+    "description": "Add support for modules to a Laravel Application",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.0.2",
+        "laravel/framework": "^v9.0.0",
+        "justinrainbow/json-schema": "^5.2.11"
+    },
+    "require-dev": {
+        "stematic/testing": "dev-develop",
+        "roave/security-advisories": "dev-master",
+        "orchestra/testbench": "^v7.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Stematic\\Modules\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Stematic\\Modules\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Stematic\\Modules\\Providers\\ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
