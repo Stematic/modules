@@ -4,92 +4,40 @@ declare(strict_types=1);
 
 namespace Stematic\Modules;
 
-use Illuminate\Support\Collection;
-use JsonException;
-use Stematic\Modules\Contracts\ModuleInterface;
-use Stematic\Modules\Concerns\DiscoverableModuleTrait;
-use Stematic\Modules\Concerns\SerializesModuleSchemaTrait;
-use Stematic\Modules\Concerns\ValidatesModuleSchemaTrait;
-use Stematic\Modules\Contracts\DiscoverableModuleInterface;
-use JsonSchema\Validator;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use JsonException;
+use Stematic\Modules\Contracts\Module as ModuleContract;
 
 use function json_decode;
-use function is_string;
 use function file_get_contents;
 use function realpath;
 
 use const JSON_THROW_ON_ERROR;
 
-class Module implements ModuleInterface, DiscoverableModuleInterface, Arrayable
+class Module implements ModuleContract, Arrayable
 {
-    use DiscoverableModuleTrait;
-    use ValidatesModuleSchemaTrait;
-    use SerializesModuleSchemaTrait;
-
     /**
      * The path for the JSON schema to validate against.
      */
     private const SCHEMA_PATH = __DIR__ . '/../module.json';
 
-    /**
-     * The module data (json decoded).
-     *
-     * @var array
-     */
-    protected array $data = [];
-
-    /**
-     * The module author data (json decoded).
-     *
-     * @var array
-     */
-    protected array $authors = [];
-
-    /**
-     * The JSON Schema Validator instance.
-     *
-     * @var Validator
-     */
-    protected Validator $validator;
-
-    protected function __construct(array $data)
-    {
-        $this->data = $data;
-        $this->validator = $this->validate();
-
-        foreach ($data['authors'] ?? [] as $author) {
-            $this->authors[] = ModuleAuthor::create($author);
-        }
+    protected function __construct(
+        protected array $data,
+        protected ComposerPackage $package,
+    ) {
     }
 
     /**
-     * Creates a new Module based on a passed in JSON string.
-     *
      * @throws JsonException
      */
-    public static function createFromJson(string $json, ?string $path = null): ModuleInterface
+    public static function make(ComposerPackage $package): Module
     {
-        $data = json_decode($json, true, 8, JSON_THROW_ON_ERROR);
-        $data['path'] = $path;
+        $path = Str::finish(realpath($package->path()), '/') . 'module.json';
+        $manifest = json_decode(file_get_contents($path), true, 8, JSON_THROW_ON_ERROR);
 
-        $module = new self($data);
-
-        // Parse the composer.json file to retrieve the service providers to
-        // automatically load for the module and the installed version, etc.
-        $module->parseComposerManifest();
-
-        return $module;
-    }
-
-    /**
-     * Returns the directory path to the installed module on disk.
-     */
-    public function path(): string
-    {
-        return is_string($this->data['path'] ?? '')
-            ? $this->data['path']
-            : '';
+        return new self($manifest, $package);
     }
 
     /**
@@ -97,47 +45,15 @@ class Module implements ModuleInterface, DiscoverableModuleInterface, Arrayable
      */
     public function name(): string
     {
-        return is_string($this->data['name'] ?? '')
-            ? $this->data['name']
-            : '';
-    }
-
-    /**
-     * Returns the modules' vendor string.
-     */
-    public function vendor(): string
-    {
-        return is_string($this->data['vendor'] ?? '')
-            ? $this->data['vendor']
-            : '';
-    }
-
-    /**
-     * Returns the modules' slug string.
-     */
-    public function slug(): string
-    {
-        return is_string($this->data['slug'] ?? '')
-            ? $this->data['slug']
-            : '';
+        return $this->data['name'] ?? $this->package->name();
     }
 
     /**
      * Returns a short description of what the module does.
      */
-    public function description(): string
+    public function description(): ?string
     {
-        return is_string($this->data['description'] ?? '')
-            ? $this->data['description']
-            : '';
-    }
-
-    /**
-     * Returns an array of module authors.
-     */
-    public function authors(): array
-    {
-        return $this->authors;
+        return $this->data['description'] ?? '';
     }
 
     /**
@@ -145,39 +61,28 @@ class Module implements ModuleInterface, DiscoverableModuleInterface, Arrayable
      */
     public function version(): string
     {
-        return is_string($this->data['version'] ?? '')
-            ? $this->data['version']
-            : '';
+        return $this->data['version'] ?? $this->package->version();
     }
 
     /**
-     * Returns the modules' composer version string.
+     * Returns an array of module authors.
+     *
+     * @return Collection<array-key, Author>
      */
-    public function composerVersion(): string
+    public function authors(): Collection
     {
-        return is_string($this->data['composer_version'] ?? '')
-            ? $this->data['composer_version']
-            : '';
+        return collect($this->data['authors'] ?? [])
+            ->map(static function (array $author) {
+                return Author::make($author);
+            });
     }
 
     /**
-     * Returns whether the structure of the module JSON file is valid.
+     * Returns the instance of the composer package.
      */
-    public function valid(): bool
+    public function package(): ComposerPackage
     {
-        return $this->validator->isValid();
-    }
-
-    /**
-     * Returns an array of errors for an invalid schema.
-     */
-    public function errors(): array
-    {
-        if ($this->valid()) {
-            return [];
-        }
-
-        return $this->validator->getErrors();
+        return $this->package;
     }
 
     /**
@@ -187,24 +92,14 @@ class Module implements ModuleInterface, DiscoverableModuleInterface, Arrayable
     {
         return [
             'name' => $this->name(),
-            'vendor' => $this->vendor(),
-            'slug' => $this->slug(),
+            'slug' => $this->package->name(),
             'description' => $this->description(),
-            'authors' => (new Collection($this->authors()))->toArray(),
+            'authors' => $this->authors()->toArray(),
             'version' => $this->version(),
-            'composer_version' => $this->composerVersion(),
-            'path' => $this->path(),
-            'providers' => $this->providers(),
-            'aliases' => $this->aliases(),
+            'composer_version' => $this->package->version(),
+            'providers' => $this->package->providers(),
+            'aliases' => $this->package->aliases(),
         ];
-    }
-
-    /**
-     * Returns the raw JSON decoded module data.
-     */
-    public function raw(): array
-    {
-        return $this->data;
     }
 
     /**

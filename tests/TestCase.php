@@ -6,6 +6,7 @@ namespace Stematic\Modules\Tests;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Illuminate\Foundation\Application;
+use Stematic\Modules\Providers\ServiceProvider;
 
 class TestCase extends OrchestraTestCase
 {
@@ -16,6 +17,6 @@ class TestCase extends OrchestraTestCase
      */
     protected function getPackageProviders($app): array
     {
-        return [];
+        return [ServiceProvider::class];
     }
 }

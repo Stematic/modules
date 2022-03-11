@@ -3,10 +3,17 @@
     "description": "Add support for modules to a Laravel Application",
     "type": "library",
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../test-module"
+        }
+    ],
     "require": {
         "php": "^8.0.2",
         "laravel/framework": "^v9.0.0",
-        "justinrainbow/json-schema": "^5.2.11"
+        "justinrainbow/json-schema": "^5.2.11",
+        "stematic/test-module": "dev-main"
     },
     "require-dev": {
         "stematic/testing": "dev-develop",
@@ -31,5 +38,10 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
 }

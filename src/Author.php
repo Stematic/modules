@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Stematic\Modules;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Stematic\Modules\Contracts\ModuleAuthorInterface;
+use Stematic\Modules\Contracts\Author as AuthorContract;
 
-use function is_string;
-
-class ModuleAuthor implements ModuleAuthorInterface, Arrayable
+class Author implements AuthorContract, Arrayable
 {
     /**
      * The module author data (json decoded).
@@ -26,7 +24,7 @@ class ModuleAuthor implements ModuleAuthorInterface, Arrayable
     /**
      * Creates a new Module Author based on a passed in JSON string.
      */
-    public static function create(array $data): ModuleAuthorInterface
+    public static function make(array $data): Author
     {
         return new self($data);
     }
@@ -36,29 +34,23 @@ class ModuleAuthor implements ModuleAuthorInterface, Arrayable
      */
     public function name(): string
     {
-        return is_string($this->data['name'] ?? '')
-            ? $this->data['name']
-            : '';
+        return $this->data['name'];
     }
 
     /**
      * Returns the authors' email address.
      */
-    public function email(): string
+    public function email(): ?string
     {
-        return is_string($this->data['email'] ?? '')
-            ? $this->data['email']
-            : '';
+        return $this->data['email'] ?? null;
     }
 
     /**
      * Returns the authors' website.
      */
-    public function website(): string
+    public function website(): ?string
     {
-        return is_string($this->data['website'] ?? '')
-            ? $this->data['website']
-            : '';
+        return $this->data['website'] ?? null;
     }
 
     /**

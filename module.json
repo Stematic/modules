@@ -5,7 +5,6 @@
     "type": "object",
     "required": [
         "name",
-        "vendor",
         "description",
         "authors",
         "version"
@@ -14,14 +13,6 @@
         "name": {
             "type": "string",
             "description": "The human readable name for the module."
-        },
-        "vendor": {
-            "type": "string",
-            "description": "A lower cased, hyphenated name of the modules vendor."
-        },
-        "slug": {
-            "type": "string",
-            "description": "A lower cased, hyphenated name of the module. If this is not set a name will be generated automatically based on the provided 'name'."
         },
         "description": {
             "type": "string",
