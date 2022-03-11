@@ -5,13 +5,8 @@ declare(strict_types=1);
 namespace Stematic\Modules;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Traits\ForwardsCalls;
-
 use Stematic\Modules\Repositories\ComposerModuleRepository;
-
-use function unserialize;
-use function serialize;
 
 /**
  * @mixin Collection<string, Module>
@@ -23,7 +18,7 @@ class Modules
     /**
      * A collection of installed modules.
      *
-     * @var Collection
+     * @var Collection<array-key, \Stematic\Modules\Contracts\Module>
      */
     protected Collection $modules;
 
@@ -34,6 +29,8 @@ class Modules
 
     /**
      * Forwards calls to the collection instance.
+     *
+     * @param array<array-key, mixed> $arguments
      */
     public function __call(string $name, array $arguments): mixed
     {

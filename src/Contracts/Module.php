@@ -10,6 +10,11 @@ use Stematic\Modules\ComposerPackage;
 interface Module
 {
     /**
+     * Factory method to create a new Module instance.
+     */
+    public static function make(ComposerPackage $package): self;
+
+    /**
      * Returns the human-readable name for the module.
      */
     public function name(): string;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Stematic\Modules\Repositories;
 
 use Illuminate\Support\Collection;
-use Stematic\Modules\Contracts\Module;
+use Stematic\Modules\Contracts\Module as ModuleContract;
 use Stematic\Modules\Contracts\Repository;
 
 abstract class BaseRepository implements Repository
@@ -13,7 +13,7 @@ abstract class BaseRepository implements Repository
     /**
      * A collection of built modules.
      *
-     * @var Collection<array-key, Module>
+     * @var Collection<array-key, ModuleContract>
      */
     protected Collection $modules;
 

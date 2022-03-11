@@ -12,19 +12,24 @@ class Author implements AuthorContract, Arrayable
     /**
      * The module author data (json decoded).
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected array $data = [];
 
+    /**
+     * @param array<string, mixed> $data
+     */
     protected function __construct(array $data)
     {
         $this->data = $data;
     }
 
     /**
-     * Creates a new Module Author based on a passed in JSON string.
+     * Creates a new Module Author based on decoded JSON from the module schema.
+     *
+     * @param array<string, mixed> $data
      */
-    public static function make(array $data): Author
+    public static function make(array $data): self
     {
         return new self($data);
     }
@@ -55,6 +60,8 @@ class Author implements AuthorContract, Arrayable
 
     /**
      * Get the instance as an array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {

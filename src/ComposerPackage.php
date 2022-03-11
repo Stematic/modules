@@ -9,6 +9,8 @@ use Illuminate\Support\Arr;
 use Stematic\Modules\Concerns\ReadsComposerManifest;
 use Stematic\Modules\Contracts\Discoverable;
 
+use function realpath;
+
 class ComposerPackage implements Discoverable
 {
     use ReadsComposerManifest;
@@ -30,9 +32,7 @@ class ComposerPackage implements Discoverable
      */
     protected bool $valid;
 
-    public function __construct(
-        protected string $name
-    ) {
+    public function __construct(protected string $name) {
         $this->build();
     }
 
@@ -54,6 +54,8 @@ class ComposerPackage implements Discoverable
 
     /**
      * Returns a list of service providers to automatically load when the module is booted.
+     *
+     * @return array<array-key, string>
      */
     public function providers(): array
     {
@@ -62,6 +64,8 @@ class ComposerPackage implements Discoverable
 
     /**
      * Returns a list of facades to automatically register when the module is booted.
+     *
+     * @return array<array-key, string>
      */
     public function aliases(): array
     {
@@ -109,7 +113,7 @@ class ComposerPackage implements Discoverable
             return;
         }
 
-        $this->manifest = $this->parseComposerManifest(realpath($path)) ?? [];
+        $this->manifest = $this->parseComposerManifest(realpath($path));
 
         $this->valid = ($this->manifest['type'] ?? '') === config('modules.type');
     }

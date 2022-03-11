@@ -18,11 +18,15 @@ interface Discoverable
 
     /**
      * Returns a list of service providers to automatically load when the module is booted.
+     *
+     * @return array<array-key, string>
      */
     public function providers(): array;
 
     /**
      * Returns a list of facades to automatically register when the module is booted.
+     *
+     * @return array<array-key, string>
      */
     public function aliases(): array;
 

@@ -9,10 +9,13 @@ use Stematic\Modules\Contracts\Validator;
 
 class SchemaValidator implements Validator
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function __construct(
         protected JsonSchemaValidator $validator,
         protected string $schema,
-        protected array $data
+        protected array $data,
     ) {
         $validator->validate($data, $schema);
     }

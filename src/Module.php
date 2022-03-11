@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonException;
 use Stematic\Modules\Contracts\Module as ModuleContract;
+use Stematic\Modules\Contracts\Author as AuthorContract;
 
 use function json_decode;
 use function file_get_contents;
@@ -23,10 +24,11 @@ class Module implements ModuleContract, Arrayable
      */
     private const SCHEMA_PATH = __DIR__ . '/../module.json';
 
-    protected function __construct(
-        protected array $data,
-        protected ComposerPackage $package,
-    ) {
+    /**
+     * @param array<array-key, string> $data
+     */
+    protected function __construct(protected array $data, protected ComposerPackage $package)
+    {
     }
 
     /**
@@ -67,12 +69,14 @@ class Module implements ModuleContract, Arrayable
     /**
      * Returns an array of module authors.
      *
-     * @return Collection<array-key, Author>
+     * @return Collection<array-key, AuthorContract>
      */
     public function authors(): Collection
     {
+        /* @phpstan-ignore-next-line */
         return collect($this->data['authors'] ?? [])
-            ->map(static function (array $author) {
+            /* @phpstan-ignore-next-line */
+            ->map(static function (array $author): Author {
                 return Author::make($author);
             });
     }
@@ -87,6 +91,8 @@ class Module implements ModuleContract, Arrayable
 
     /**
      * Get the instance as an array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {

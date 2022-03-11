@@ -6,6 +6,13 @@ namespace Stematic\Modules\Concerns;
 
 use JsonException;
 use Stematic\Modules\ComposerPackage;
+use Illuminate\Support\Str;
+
+use function file_exists;
+use function json_decode;
+use function file_get_contents;
+
+use const JSON_THROW_ON_ERROR;
 
 /**
  * @mixin ComposerPackage
@@ -14,10 +21,12 @@ trait ReadsComposerManifest
 {
     /**
      * Returns the decoded composer.json file for the package.
+     *
+     * @return array<string, mixed>
      */
     protected function parseComposerManifest(string $path): array
     {
-        $file = \Str::finish($path, '/') . self::COMPOSER_JSON;
+        $file = Str::finish($path, '/') . self::COMPOSER_JSON;
 
         if (! file_exists($file)) {
             return [];

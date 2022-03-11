@@ -7,14 +7,15 @@ namespace Stematic\Modules\Repositories;
 use Composer\InstalledVersions;
 use Illuminate\Support\Collection;
 use Stematic\Modules\ComposerPackage;
-use Stematic\Modules\Contracts\Module;
+use Stematic\Modules\Contracts\Module as ModuleContract;
+use Stematic\Modules\Module;
 
 class ComposerModuleRepository extends BaseRepository
 {
     /**
      * Returns a collection of all loaded modules.
      *
-     * @return Collection<array-key, Module>
+     * @return Collection<array-key, ModuleContract>
      */
     public function all(): Collection
     {
@@ -25,7 +26,7 @@ class ComposerModuleRepository extends BaseRepository
      * Returns a module by the given slug.
      * E.g. "stematic/my-module".
      */
-    public function get(string $slug): Module
+    public function get(string $slug): ModuleContract
     {
         return $this->modules->get($slug);
     }
@@ -42,8 +43,11 @@ class ComposerModuleRepository extends BaseRepository
             ->filter(static function (ComposerPackage $package): bool {
                 return $package->valid();
             })
-            ->map(static function (ComposerPackage $package): Module {
-                return \Stematic\Modules\Module::make($package);
+            ->map(static function (ComposerPackage $package): ModuleContract {
+                /** @var ModuleContract $module */
+                $module = Module::make($package);
+
+                return $module;
             });
     }
 }
